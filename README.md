@@ -1,5 +1,6 @@
 exy_xss v1.0
 
 Usage options :
-
-./ezy-xss.sh -d target.com
+chmod +x install.sh
+./install.sh
+./ezy-xss.sh -d hackerone.com
