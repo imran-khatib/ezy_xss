@@ -8,3 +8,6 @@ chmod +x install.sh
 
 
 ./ezy-xss.sh -d hackerone.com
+
+Credit goes to Devansh(Asm0d3us) (devanshbatham009@gmail.com)
+and  hahwul (hahwul@gmail.com)
