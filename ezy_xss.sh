@@ -16,7 +16,7 @@ printf """
 
            
 """
-domain=$1
+
 . ~/ezy_xss/.config
 
 while getopts ":d:" input;do
