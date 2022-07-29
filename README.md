@@ -10,7 +10,7 @@ chmod +x install.sh
 
 ./install.sh
 
-./ezy-xss.sh -d exampl.com
+./ezy-xss.sh -d example.com
 
 Credit goes to Devansh(Asm0d3us) (devanshbatham009@gmail.com)
 and  hahwul (hahwul@gmail.com)
