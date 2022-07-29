@@ -6,7 +6,8 @@ Note: Golang & Python are required for this tool
 
 Usage options :
 
-chmod +x install.sh
+chmod +x *.sh
+
 
 ./install.sh
 
