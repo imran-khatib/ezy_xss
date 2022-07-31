@@ -13,5 +13,7 @@ chmod +x *.sh
 
 ./ezy-xss.sh -d example.com
 
+plz make changes in .config file...
+
 Credit goes to Devansh(Asm0d3us) (devanshbatham009@gmail.com)
 and  hahwul (hahwul@gmail.com)
