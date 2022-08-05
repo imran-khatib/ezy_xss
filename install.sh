@@ -6,7 +6,7 @@ NC='\033[0m'
 
 
 echo -e "${green}[*] Installing Essentials${NC}"
-apt-get update -y -silent
+apt-get update -y --silent 
 apt-get upgrade -y -silent
 cd $HOME
 mkdir tools
