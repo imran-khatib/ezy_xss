@@ -1,17 +1,17 @@
 
-#			            exy_xss v1.0                                 	#
+#			            ezy_xss v1.0                                 	#
 
 
 Note: Golang & Python are required for this tool
 
 Usage options :
 
-chmod +x *.sh
+chmod +x *
 
 
 ./install.sh
 
-./ezy-xss.sh -d example.com
+./ezy_xss.sh -d example.com
 
 plz make changes in .config file...
 
