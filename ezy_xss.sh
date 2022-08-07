@@ -27,7 +27,7 @@ while getopts ":d:" input;do
         done
 if [ -z "$domain" ]     
         then
-                echo "Please use \"-d target.com\""
+                echo "Please use \"./ezy_xss.sh -d target.com\""
                 exit 1
 fi
 
