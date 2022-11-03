@@ -1,6 +1,6 @@
 
 #!/bin/bash
-
+clear
 green=`echo -en "\e[32m"`
 blue=`echo -en "\e[34m"`
 NC='\033[0m'
