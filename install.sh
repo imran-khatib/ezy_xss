@@ -30,4 +30,8 @@ for tool in "${TOOLS[@]}"; do
              GO111MODULE=on go install github.com/tomnomnom/waybackurls@latest
         elif [ "$tool" = "qsreplace" ]; then     
              GO111MODULE=on go install github.com/tomnomnom/qsreplace@latest
+        fi
+        else
+        echo "$tool is already installed"
+        fi
 done
