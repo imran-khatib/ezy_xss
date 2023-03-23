@@ -26,10 +26,15 @@ for tool in "${TOOLS[@]}"; do
             cd ParamSpider
             pip3 install -r requirements.txt
             cd .. 
+             echo "${green}Installed Parampsider..${NC}"
         elif [ "$tool" = "waybackurls" ]; then
+             echo "${green}Installing Waybackurls..${NC}"
              GO111MODULE=on go install github.com/tomnomnom/waybackurls@latest
-        elif [ "$tool" = "qsreplace" ]; then     
+             echo "${green}Installed Waybackurls..${NC}"
+        elif [ "$tool" = "qsreplace" ]; then  
+             echo "${green}Installing qsrepace..${NC}"
              GO111MODULE=on go install github.com/tomnomnom/qsreplace@latest
+             echo "${green}Installed qsrepace${NC}"
         fi
         else
         echo "$tool is already installed"
