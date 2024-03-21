@@ -6,11 +6,13 @@ Note: Golang & Python are required for this tool
 
 Usage options :
 
-chmod +x *
+
 
 git clone https://github.com/imran-khatib/ezy_xss.git
 
 cd ezy_xss
+
+chmod +x *
 
 ./install.sh
 
