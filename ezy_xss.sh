@@ -37,7 +37,7 @@ mkdir -p $domain
 echo  "\n\n\n \e[1;33m Scanning For \e[5m\e[96mXSS_Parameters \e[25m\e[1;33mWait...\e[0m\n"
 
 
-python3 ~/tools/ParamSpider/./paramspider.py --domain $domain | tee -a $domain/params.txt 
+paramspider --domain $domain | tee -a $domain/params.txt 
 
  
 
