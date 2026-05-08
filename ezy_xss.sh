@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =============================================
-#          EZY_XSS v1.2 - Enhanced
+#          EZY_XSS v1.3 - Final Enhanced
 #          By e1Pr0f3ss0r
 # =============================================
 
@@ -21,7 +21,7 @@ printf """${CYAN}
 / __/ / // /_/ / / |___/ /__/ /
 \___/ /___|__, /____/_/|_/____/____/
          /____/_____/
-           V-1.2___By e1Pr0f3ss0r
+           V-1.3___By e1Pr0f3ss0r
 ${NC}
 """
 
@@ -29,44 +29,47 @@ ${NC}
 if [ -f ~/ezy_xss/.config ]; then
     . ~/ezy_xss/.config
 else
-    echo -e "${RED}[!] Config file not found!${NC}"
+    echo -e "${RED}[!] Config file ~/ezy_xss/.config not found!${NC}"
     exit 1
 fi
 
-if [ -z "$xsshunter_domain" ] || [ -z "$xss_payload" ]; then
-    echo -e "${RED}[!] Missing xsshunter_domain or xss_payload in config${NC}"
+[ -z "$xsshunter_domain" ] || [ -z "$xss_payload" ] && {
+    echo -e "${RED}[!] Missing variables in config file${NC}"
     exit 1
-fi
+}
 
-# Argument check
-while getopts ":d:" opt; do
-    case "$opt" in
-        d) domain="${OPTARG}" ;;
-        *) echo -e "${RED}Usage: $0 -d target.com${NC}"; exit 1 ;;
-    esac
-done
-
-[ -z "$domain" ] && { echo -e "${RED}Usage: $0 -d target.com${NC}"; exit 1; }
+# Argument
+domain=$1
+[ -z "$domain" ] && {
+    echo -e "${RED}Usage: $0 <target.com>${NC}"
+    exit 1
+}
 
 mkdir -p "$domain"
 
-echo -e "${YELLOW}[+] Target:${CYAN} $domain ${NC}\n"
+echo -e "${YELLOW}[+] Target: ${CYAN}$domain${NC}\n"
+
+# Tool Check
+for tool in paramspider dalfox gau waybackurls qsreplace; do
+    if ! command -v "$tool" &> /dev/null; then
+        echo -e "${YELLOW}[!] $tool not installed. Continuing without it...${NC}"
+    fi
+done
 
 # ========================
-echo -e "${YELLOW}[1] Collecting parameters...${NC}"
+echo -e "${YELLOW}[1] Collecting Parameters...${NC}"
 
 > "$domain/params.txt"
 
-echo -e "${CYAN}   → Running ParamSpider...${NC}"
+echo -e "${CYAN}   → ParamSpider${NC}"
 paramspider --domain "$domain" --output "$domain/params.txt" 2>/dev/null
 
-# Additional methods if ParamSpider gives nothing
-if [ ! -s "$domain/params.txt" ] || [ $(wc -l < "$domain/params.txt") -lt 5 ]; then
-    echo -e "${YELLOW}   → ParamSpider found very few results. Trying more methods...${NC}"
+# Fallback methods
+if [ $(wc -l < "$domain/params.txt") -lt 10 ]; then
+    echo -e "${YELLOW}   → ParamSpider returned very few results. Using fallbacks...${NC}"
     
-    # Method 2: Waybackurls / gau
     if command -v gau &> /dev/null; then
-        echo -e "${CYAN}   → Running gau (Wayback Machine)...${NC}"
+        echo -e "${CYAN}   → Running gau...${NC}"
         gau "$domain" --subs | grep '?' >> "$domain/params.txt" 2>/dev/null
     fi
 
@@ -76,45 +79,43 @@ if [ ! -s "$domain/params.txt" ] || [ $(wc -l < "$domain/params.txt") -lt 5 ]; t
     fi
 fi
 
-# Remove duplicates
+# Clean & remove duplicates
 sort -u "$domain/params.txt" -o "$domain/params.txt"
 
 param_count=$(wc -l < "$domain/params.txt")
+echo -e "${GREEN}[✔] Total URLs with parameters: $param_count${NC}"
 
 if [ "$param_count" -eq 0 ]; then
-    echo -e "${RED}[!] No parameters found even after additional tools.${NC}"
-    echo -e "${YELLOW}Tips:${NC}"
-    echo -e "   • Try a subdomain: -d sub.particleth.com"
-    echo -e "   • Crawl manually with Katana or Hakrawler"
-    echo -e "   • The site may not have many query parameters."
+    echo -e "${RED}[!] No parameters found. Try a different domain or use Katana.${NC}"
     exit 1
-else
-    echo -e "${GREEN}[✔] Found ${param_count} URLs with parameters.${NC}"
 fi
 
 # ========================
-echo -e "\n${YELLOW}[2] Scanning with Dalfox...${NC}"
+echo -e "\n${YELLOW}[2] Scanning with Dalfox + Blind XSS...${NC}"
 dalfox file "$domain/params.txt" -b "$xsshunter_domain" -o "$domain/dalfox-xss.txt" --silence --skip-bav
 
-echo -e "\n${YELLOW}[3] Custom Reflected XSS Check...${NC}"
+# ========================
+echo -e "\n${YELLOW}[3] Custom Reflected XSS Testing...${NC}"
+
 cat "$domain/params.txt" | qsreplace "$xss_payload" > "$domain/fuzz.txt" 2>/dev/null
 
 > "$domain/Vuln-xss.txt"
 
 while IFS= read -r host; do
     [[ -z "$host" ]] && continue
-    if curl -s -k --max-time 10 "$host" | grep -q "$xss_payload"; then
-        echo -e "${RED}[VULN]${NC} $host"
+    echo -ne "${CYAN}Testing → ${host:0:70}...${NC}\r"
+    
+    if curl -s -k --max-time 10 "$host" | grep -q "$(echo "$xss_payload" | sed 's/[^a-zA-Z0-9]//g' | cut -c1-20)"; then
+        echo -e "\n${RED}[VULNERABLE]${NC} $host"
         echo "$host" >> "$domain/Vuln-xss.txt"
     fi
 done < "$domain/fuzz.txt"
 
-# Final Summary
 echo -e "\n${GREEN}=====================================${NC}"
-echo -e "${GREEN}Scan Finished for $domain${NC}"
-echo -e "${GREEN}Parameters found : $param_count${NC}"
-echo -e "${GREEN}Results saved in : $domain/${NC}"
-ls "$domain" | sed 's/^/   • /'
+echo -e "${GREEN}Scan Completed for $domain${NC}"
+echo -e "${GREEN}Results saved in folder: $domain/${NC}"
 echo -e "${GREEN}=====================================${NC}"
 
-[[ -s "$domain/Vuln-xss.txt" ]] && echo -e "${RED}[!!!] Found $(wc -l < "$domain/Vuln-xss.txt") potential vulnerable links!${NC}"
+if [ -s "$domain/Vuln-xss.txt" ]; then
+    echo -e "${RED}[!!!] $(wc -l < "$domain/Vuln-xss.txt") Vulnerable URL(s) Found!${NC}"
+fi
